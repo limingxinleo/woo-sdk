@@ -2,20 +2,19 @@
 
 declare(strict_types=1);
 /**
- * This file is part of limingxinleo/woo-sdk.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/limingxinleo/woo-sdk
- * @document https://github.com/limingxinleo/woo-sdk
- * @contact  limingxinleo@gmail.com
- * @license  https://github.com/limingxinleo/woo-sdk/blob/master/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace HyperfTest\Cases;
 
-use HyperfTest\Cases\AbstractTestCase;
+use ReflectionClass;
 use Woo\Auth\Authenticator;
 use Woo\Config\Config;
-use Woo\WooClient;
 
 /**
  * @internal
@@ -119,7 +118,7 @@ class AuthenticatorTest extends AbstractTestCase
         $url = 'https://example.com/wp-json/wc/v3/orders';
 
         // 使用反射来固定 nonce 和 timestamp, 以验证方法影响签名
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
 
         $getSig = $this->invokePrivateGenerateSignature('GET', $url);
         $postSig = $this->invokePrivateGenerateSignature('POST', $url);
@@ -135,7 +134,7 @@ class AuthenticatorTest extends AbstractTestCase
      */
     public function testNormalizeBaseUrlRemovesDefaultHttpsPort(): void
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $method = $ref->getMethod('normalizeBaseUrl');
 
         $result = $method->invoke($this->authenticator, parse_url('https://example.com:443/wp-json/wc/v3/orders'));
@@ -148,7 +147,7 @@ class AuthenticatorTest extends AbstractTestCase
      */
     public function testNormalizeBaseUrlRemovesDefaultHttpPort(): void
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $method = $ref->getMethod('normalizeBaseUrl');
 
         $result = $method->invoke($this->authenticator, parse_url('http://example.com:80/wp-json/wc/v3/orders'));
@@ -161,7 +160,7 @@ class AuthenticatorTest extends AbstractTestCase
      */
     public function testNormalizeBaseUrlPreservesNonDefaultPort(): void
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $method = $ref->getMethod('normalizeBaseUrl');
 
         $result = $method->invoke($this->authenticator, parse_url('https://example.com:8080/wp-json/wc/v3/orders'));
@@ -174,7 +173,7 @@ class AuthenticatorTest extends AbstractTestCase
      */
     public function testNormalizeBaseUrlLowercasesSchemeAndHost(): void
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $method = $ref->getMethod('normalizeBaseUrl');
 
         $result = $method->invoke($this->authenticator, parse_url('HTTPS://EXAMPLE.COM/wp-json/wc/v3/orders'));
@@ -187,7 +186,7 @@ class AuthenticatorTest extends AbstractTestCase
      */
     public function testBuildParamStringSortsAlphabetically(): void
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $method = $ref->getMethod('buildParamString');
 
         $params = [
@@ -208,7 +207,7 @@ class AuthenticatorTest extends AbstractTestCase
      */
     public function testBuildParamStringEncodesSpecialCharacters(): void
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $method = $ref->getMethod('buildParamString');
 
         $params = [
@@ -226,7 +225,7 @@ class AuthenticatorTest extends AbstractTestCase
      */
     public function testGenerateNonceIsUnique(): void
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $method = $ref->getMethod('generateNonce');
 
         $nonce1 = $method->invoke($this->authenticator);
@@ -278,11 +277,11 @@ class AuthenticatorTest extends AbstractTestCase
      */
     private function invokePrivateGenerateSignature(string $method, string $url, array $params = []): string
     {
-        $ref = new \ReflectionClass($this->authenticator);
+        $ref = new ReflectionClass($this->authenticator);
         $generateSignature = $ref->getMethod('generateSignature');
 
         // 创建一个子类来覆盖 buildOAuthParams 以返回固定值
-        $authenticator = new class ($this->config) extends Authenticator {
+        $authenticator = new class($this->config) extends Authenticator {
             public function exposedBuildOAuthParams(): array
             {
                 return $this->buildOAuthParams();

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 /**
- * This file is part of limingxinleo/woo-sdk.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/limingxinleo/woo-sdk
- * @document https://github.com/limingxinleo/woo-sdk
- * @contact  limingxinleo@gmail.com
- * @license  https://github.com/limingxinleo/woo-sdk/blob/master/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace Woo\Auth;
@@ -49,8 +49,8 @@ class Authenticator
      * 生成 OAuth 1.0a Authorization Header.
      *
      * @param string $method HTTP 请求方法 (GET, POST, PUT, DELETE 等)
-     * @param string $url    完整的请求 URL (可含 query string)
-     * @param array  $params 请求体参数 (POST/PUT body params)
+     * @param string $url 完整的请求 URL (可含 query string)
+     * @param array $params 请求体参数 (POST/PUT body params)
      * @return string Authorization header 值 (不含 "Authorization: " 前缀)
      */
     public function generateAuthHeader(string $method, string $url, array $params = []): string
@@ -83,8 +83,8 @@ class Authenticator
      * 适用于需要在 URL 中传递认证信息的场景.
      *
      * @param string $method HTTP 请求方法
-     * @param string $url    原始请求 URL
-     * @param array  $params 请求体参数
+     * @param string $url 原始请求 URL
+     * @param array $params 请求体参数
      * @return string 带 OAuth 签名参数的完整 URL
      */
     public function generateAuthUrl(string $method, string $url, array $params = []): string

@@ -12,17 +12,17 @@ declare(strict_types=1);
 
 namespace Woo\Schema;
 
-class OrderMetadata
+class OrderRefund
 {
     /**
-     * @param int $id Meta ID. READ-ONLY
-     * @param string $key Meta key
-     * @param string $value Meta value
+     * @param int $id Refund ID. READ-ONLY
+     * @param string $reason Refund reason. READ-ONLY
+     * @param string $total Refund total. READ-ONLY
      */
     public function __construct(
         public int $id = 0,
-        public string $key = '',
-        public string $value = '',
+        public string $reason = '',
+        public string $total = '',
     ) {
     }
 }

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 /**
- * This file is part of limingxinleo/woo-sdk.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/limingxinleo/woo-sdk
- * @document https://github.com/limingxinleo/woo-sdk
- * @contact  limingxinleo@gmail.com
- * @license  https://github.com/limingxinleo/woo-sdk/blob/master/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace Woo;
@@ -42,8 +42,8 @@ class WooClient
      * 创建带 OAuth 签名的完整 API 请求 URL.
      *
      * @param string $method HTTP 方法
-     * @param string $path   API 路径 (相对于 store URL, 如 "/wp-json/wc/v3/orders")
-     * @param array  $params 请求参数
+     * @param string $path API 路径 (相对于 store URL, 如 "/wp-json/wc/v3/orders")
+     * @param array $params 请求参数
      * @return string 带 OAuth 签名的完整 URL
      */
     public function buildAuthUrl(string $method, string $path, array $params = []): string
@@ -57,8 +57,8 @@ class WooClient
      * 生成 OAuth 认证请求头.
      *
      * @param string $method HTTP 方法
-     * @param string $path   API 路径
-     * @param array  $params 请求参数
+     * @param string $path API 路径
+     * @param array $params 请求参数
      * @return string Authorization header 值
      */
     public function buildAuthHeader(string $method, string $path, array $params = []): string

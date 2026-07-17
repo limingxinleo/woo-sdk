@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 /**
- * This file is part of limingxinleo/woo-sdk.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/limingxinleo/woo-sdk
- * @document https://github.com/limingxinleo/woo-sdk
- * @contact  limingxinleo@gmail.com
- * @license  https://github.com/limingxinleo/woo-sdk/blob/master/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace HyperfTest\Cases;
 
-use HyperfTest\Cases\AbstractTestCase;
 use Woo\Config\Config;
 use Woo\WooClient;
 
