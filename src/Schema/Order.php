@@ -12,12 +12,15 @@ declare(strict_types=1);
 
 namespace Woo\Schema;
 
+use Hyperf\Contract\JsonDeSerializable;
+use JsonSerializable;
+
 /**
  * WooCommerce Order 数据模型.
  *
  * @see https://woocommerce.github.io/woocommerce-rest-api-docs/#orders
  */
-class Order
+class Order implements JsonSerializable, JsonDeSerializable
 {
     /**
      * @param int $id Unique identifier for the resource. READ-ONLY
@@ -107,5 +110,122 @@ class Order
         public array $refunds = [],
         public bool $set_paid = false,
     ) {
+    }
+
+    public static function jsonDeSerialize(mixed $data): static
+    {
+        return new static(
+            $data['id'] ?? 0,
+            $data['parent_id'] ?? 0,
+            $data['number'] ?? '',
+            $data['order_key'] ?? '',
+            $data['created_via'] ?? '',
+            $data['version'] ?? '',
+            $data['status'] ?? '',
+            $data['currency'] ?? '',
+            $data['date_created'] ?? '',
+            $data['date_created_gmt'] ?? '',
+            $data['date_modified'] ?? '',
+            $data['date_modified_gmt'] ?? '',
+            $data['discount_total'] ?? '',
+            $data['discount_tax'] ?? '',
+            $data['shipping_total'] ?? '',
+            $data['shipping_tax'] ?? '',
+            $data['cart_tax'] ?? '',
+            $data['total'] ?? '',
+            $data['total_tax'] ?? '',
+            $data['prices_include_tax'] ?? false,
+            $data['customer_id'] ?? 0,
+            $data['customer_ip_address'] ?? '',
+            $data['customer_user_agent'] ?? '',
+            $data['customer_note'] ?? '',
+            isset($data['billing']) && is_array($data['billing']) ? OrderBilling::jsonDeSerialize($data['billing']) : null,
+            isset($data['shipping']) && is_array($data['shipping']) ? OrderShipping::jsonDeSerialize($data['shipping']) : null,
+            $data['payment_method'] ?? '',
+            $data['payment_method_title'] ?? '',
+            $data['transaction_id'] ?? '',
+            $data['date_paid'] ?? '',
+            $data['date_paid_gmt'] ?? '',
+            $data['date_completed'] ?? '',
+            $data['date_completed_gmt'] ?? '',
+            $data['cart_hash'] ?? '',
+            array_map(
+                static fn (array $item) => OrderMetadata::jsonDeSerialize($item),
+                $data['meta_data'] ?? [],
+            ),
+            array_map(
+                static fn (array $item) => OrderLineItem::jsonDeSerialize($item),
+                $data['line_items'] ?? [],
+            ),
+            array_map(
+                static fn (array $item) => OrderTaxLine::jsonDeSerialize($item),
+                $data['tax_lines'] ?? [],
+            ),
+            array_map(
+                static fn (array $item) => OrderShippingLine::jsonDeSerialize($item),
+                $data['shipping_lines'] ?? [],
+            ),
+            array_map(
+                static fn (array $item) => OrderFeeLine::jsonDeSerialize($item),
+                $data['fee_lines'] ?? [],
+            ),
+            array_map(
+                static fn (array $item) => OrderCouponLine::jsonDeSerialize($item),
+                $data['coupon_lines'] ?? [],
+            ),
+            array_map(
+                static fn (array $item) => OrderRefund::jsonDeSerialize($item),
+                $data['refunds'] ?? [],
+            ),
+            $data['set_paid'] ?? false,
+        );
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'parent_id' => $this->parent_id,
+            'number' => $this->number,
+            'order_key' => $this->order_key,
+            'created_via' => $this->created_via,
+            'version' => $this->version,
+            'status' => $this->status,
+            'currency' => $this->currency,
+            'date_created' => $this->date_created,
+            'date_created_gmt' => $this->date_created_gmt,
+            'date_modified' => $this->date_modified,
+            'date_modified_gmt' => $this->date_modified_gmt,
+            'discount_total' => $this->discount_total,
+            'discount_tax' => $this->discount_tax,
+            'shipping_total' => $this->shipping_total,
+            'shipping_tax' => $this->shipping_tax,
+            'cart_tax' => $this->cart_tax,
+            'total' => $this->total,
+            'total_tax' => $this->total_tax,
+            'prices_include_tax' => $this->prices_include_tax,
+            'customer_id' => $this->customer_id,
+            'customer_ip_address' => $this->customer_ip_address,
+            'customer_user_agent' => $this->customer_user_agent,
+            'customer_note' => $this->customer_note,
+            'billing' => $this->billing,
+            'shipping' => $this->shipping,
+            'payment_method' => $this->payment_method,
+            'payment_method_title' => $this->payment_method_title,
+            'transaction_id' => $this->transaction_id,
+            'date_paid' => $this->date_paid,
+            'date_paid_gmt' => $this->date_paid_gmt,
+            'date_completed' => $this->date_completed,
+            'date_completed_gmt' => $this->date_completed_gmt,
+            'cart_hash' => $this->cart_hash,
+            'meta_data' => $this->meta_data,
+            'line_items' => $this->line_items,
+            'tax_lines' => $this->tax_lines,
+            'shipping_lines' => $this->shipping_lines,
+            'fee_lines' => $this->fee_lines,
+            'coupon_lines' => $this->coupon_lines,
+            'refunds' => $this->refunds,
+            'set_paid' => $this->set_paid,
+        ];
     }
 }

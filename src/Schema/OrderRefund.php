@@ -12,7 +12,10 @@ declare(strict_types=1);
 
 namespace Woo\Schema;
 
-class OrderRefund
+use Hyperf\Contract\JsonDeSerializable;
+use JsonSerializable;
+
+class OrderRefund implements JsonSerializable, JsonDeSerializable
 {
     /**
      * @param int $id Refund ID. READ-ONLY
@@ -24,5 +27,23 @@ class OrderRefund
         public string $reason = '',
         public string $total = '',
     ) {
+    }
+
+    public static function jsonDeSerialize(mixed $data): static
+    {
+        return new static(
+            $data['id'] ?? 0,
+            $data['reason'] ?? '',
+            $data['total'] ?? '',
+        );
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'reason' => $this->reason,
+            'total' => $this->total,
+        ];
     }
 }

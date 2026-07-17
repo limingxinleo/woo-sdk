@@ -12,7 +12,10 @@ declare(strict_types=1);
 
 namespace Woo\Schema;
 
-class OrderLineItem
+use Hyperf\Contract\JsonDeSerializable;
+use JsonSerializable;
+
+class OrderLineItem implements JsonSerializable, JsonDeSerializable
 {
     /**
      * @param int $id Item ID. READ-ONLY
@@ -48,5 +51,53 @@ class OrderLineItem
         public string $sku = '',
         public string $price = '',
     ) {
+    }
+
+    public static function jsonDeSerialize(mixed $data): static
+    {
+        return new static(
+            $data['id'] ?? 0,
+            $data['name'] ?? '',
+            $data['parent_name'] ?? null,
+            $data['product_id'] ?? 0,
+            $data['variation_id'] ?? 0,
+            $data['quantity'] ?? 0,
+            $data['tax_class'] ?? '',
+            $data['subtotal'] ?? '',
+            $data['subtotal_tax'] ?? '',
+            $data['total'] ?? '',
+            $data['total_tax'] ?? '',
+            array_map(
+                static fn (array $item) => OrderTaxLine::jsonDeSerialize($item),
+                $data['taxes'] ?? [],
+            ),
+            array_map(
+                static fn (array $item) => OrderMetadata::jsonDeSerialize($item),
+                $data['meta_data'] ?? [],
+            ),
+            $data['sku'] ?? '',
+            $data['price'] ?? '',
+        );
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'parent_name' => $this->parent_name,
+            'product_id' => $this->product_id,
+            'variation_id' => $this->variation_id,
+            'quantity' => $this->quantity,
+            'tax_class' => $this->tax_class,
+            'subtotal' => $this->subtotal,
+            'subtotal_tax' => $this->subtotal_tax,
+            'total' => $this->total,
+            'total_tax' => $this->total_tax,
+            'taxes' => $this->taxes,
+            'meta_data' => $this->meta_data,
+            'sku' => $this->sku,
+            'price' => $this->price,
+        ];
     }
 }

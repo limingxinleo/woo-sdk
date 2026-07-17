@@ -12,7 +12,10 @@ declare(strict_types=1);
 
 namespace Woo\Schema;
 
-class OrderTaxLine
+use Hyperf\Contract\JsonDeSerializable;
+use JsonSerializable;
+
+class OrderTaxLine implements JsonSerializable, JsonDeSerializable
 {
     /**
      * @param int $id Item ID. READ-ONLY
@@ -34,5 +37,36 @@ class OrderTaxLine
         public string $shipping_tax_total = '',
         public array $meta_data = [],
     ) {
+    }
+
+    public static function jsonDeSerialize(mixed $data): static
+    {
+        return new static(
+            $data['id'] ?? 0,
+            $data['rate_code'] ?? '',
+            $data['rate_id'] ?? 0,
+            $data['label'] ?? '',
+            $data['compound'] ?? false,
+            $data['tax_total'] ?? '',
+            $data['shipping_tax_total'] ?? '',
+            array_map(
+                static fn (array $item) => OrderMetadata::jsonDeSerialize($item),
+                $data['meta_data'] ?? [],
+            ),
+        );
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'rate_code' => $this->rate_code,
+            'rate_id' => $this->rate_id,
+            'label' => $this->label,
+            'compound' => $this->compound,
+            'tax_total' => $this->tax_total,
+            'shipping_tax_total' => $this->shipping_tax_total,
+            'meta_data' => $this->meta_data,
+        ];
     }
 }

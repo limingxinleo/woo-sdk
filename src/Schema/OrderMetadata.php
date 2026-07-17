@@ -12,7 +12,10 @@ declare(strict_types=1);
 
 namespace Woo\Schema;
 
-class OrderMetadata
+use Hyperf\Contract\JsonDeSerializable;
+use JsonSerializable;
+
+class OrderMetadata implements JsonSerializable, JsonDeSerializable
 {
     /**
      * @param int $id Meta ID. READ-ONLY
@@ -24,5 +27,23 @@ class OrderMetadata
         public string $key = '',
         public string $value = '',
     ) {
+    }
+
+    public static function jsonDeSerialize(mixed $data): static
+    {
+        return new static(
+            $data['id'] ?? 0,
+            $data['key'] ?? '',
+            $data['value'] ?? '',
+        );
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'key' => $this->key,
+            'value' => $this->value,
+        ];
     }
 }

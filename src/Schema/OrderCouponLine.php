@@ -12,7 +12,10 @@ declare(strict_types=1);
 
 namespace Woo\Schema;
 
-class OrderCouponLine
+use Hyperf\Contract\JsonDeSerializable;
+use JsonSerializable;
+
+class OrderCouponLine implements JsonSerializable, JsonDeSerializable
 {
     /**
      * @param int $id Item ID. READ-ONLY
@@ -28,5 +31,30 @@ class OrderCouponLine
         public string $discount_tax = '',
         public array $meta_data = [],
     ) {
+    }
+
+    public static function jsonDeSerialize(mixed $data): static
+    {
+        return new static(
+            $data['id'] ?? 0,
+            $data['code'] ?? '',
+            $data['discount'] ?? '',
+            $data['discount_tax'] ?? '',
+            array_map(
+                static fn (array $item) => OrderMetadata::jsonDeSerialize($item),
+                $data['meta_data'] ?? [],
+            ),
+        );
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'code' => $this->code,
+            'discount' => $this->discount,
+            'discount_tax' => $this->discount_tax,
+            'meta_data' => $this->meta_data,
+        ];
     }
 }
