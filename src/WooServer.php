@@ -17,8 +17,28 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class WooServer
 {
+    /**
+     * @var ServerHandlerInterface[]
+     */
+    public array $handlers = [];
+
     public function run(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        $path = $request->getUri()->getPath();
+        $method = strtoupper($request->getMethod());
+
+        foreach ($this->handlers as $handler) {
+            if ($handler->is($method, $path)) {
+                return $handler->handle($request, $response);
+            }
+        }
+
         return $response;
+    }
+
+    public function register(ServerHandlerInterface $handler): static
+    {
+        $this->handlers[] = $handler;
+        return $this;
     }
 }
