@@ -15,6 +15,11 @@ namespace Woo\Order\Request;
 use Hyperf\Contract\JsonDeSerializable;
 use JsonSerializable;
 
+use function Woo\array_or_null;
+use function Woo\bool_or_null;
+use function Woo\int_or_null;
+use function Woo\string_or_null;
+
 class ListRequest implements JsonSerializable, JsonDeSerializable
 {
     /**
@@ -68,27 +73,27 @@ class ListRequest implements JsonSerializable, JsonDeSerializable
     public static function jsonDeSerialize(mixed $data): static
     {
         return new static(
-            $data['context'] ?? null,
-            $data['page'] ?? null,
-            $data['per_page'] ?? null,
-            $data['search'] ?? null,
-            $data['after'] ?? null,
-            $data['before'] ?? null,
-            $data['modified_after'] ?? null,
-            $data['modified_before'] ?? null,
-            $data['dates_are_gmt'] ?? null,
-            $data['exclude'] ?? null,
-            $data['include'] ?? null,
-            $data['offset'] ?? null,
-            $data['order'] ?? null,
-            $data['orderby'] ?? null,
-            $data['parent'] ?? null,
-            $data['parent_exclude'] ?? null,
-            $data['status'] ?? null,
-            $data['customer'] ?? null,
-            $data['product'] ?? null,
-            $data['dp'] ?? null,
-            $data['created_via'] ?? null,
+            string_or_null($data['context'] ?? null),
+            int_or_null($data['page'] ?? null),
+            int_or_null($data['per_page'] ?? null),
+            string_or_null($data['search'] ?? null),
+            string_or_null($data['after'] ?? null),
+            string_or_null($data['before'] ?? null),
+            string_or_null($data['modified_after'] ?? null),
+            string_or_null($data['modified_before'] ?? null),
+            bool_or_null($data['dates_are_gmt'] ?? null),
+            array_or_null($data['exclude'] ?? null),
+            array_or_null($data['include'] ?? null),
+            int_or_null($data['offset'] ?? null),
+            string_or_null($data['order'] ?? null),
+            string_or_null($data['orderby'] ?? null),
+            array_or_null($data['parent'] ?? null),
+            array_or_null($data['parent_exclude'] ?? null),
+            array_or_null($data['status'] ?? null),
+            int_or_null($data['customer'] ?? null),
+            int_or_null($data['product'] ?? null),
+            int_or_null($data['dp'] ?? null),
+            string_or_null($data['created_via'] ?? null),
         );
     }
 
