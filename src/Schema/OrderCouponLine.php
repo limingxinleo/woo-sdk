@@ -15,46 +15,48 @@ namespace Woo\Schema;
 use Hyperf\Contract\JsonDeSerializable;
 use JsonSerializable;
 
+use function Woo\int_or_null;
+use function Woo\string_or_null;
+
 class OrderCouponLine implements JsonSerializable, JsonDeSerializable
 {
     /**
-     * @param int $id Item ID. READ-ONLY
-     * @param string $code Coupon code
-     * @param string $discount Discount total. READ-ONLY
-     * @param string $discount_tax Discount total tax. READ-ONLY
-     * @param OrderMetadata[] $meta_data Meta data
+     * @param null|int $id Item ID. READ-ONLY
+     * @param null|string $code Coupon code
+     * @param null|string $discount Discount total. READ-ONLY
+     * @param null|string $discount_tax Discount total tax. READ-ONLY
+     * @param null|OrderMetadata[] $meta_data Meta data
      */
     public function __construct(
-        public int $id = 0,
-        public string $code = '',
-        public string $discount = '',
-        public string $discount_tax = '',
-        public array $meta_data = [],
+        public ?int $id = null,
+        public ?string $code = null,
+        public ?string $discount = null,
+        public ?string $discount_tax = null,
+        public ?array $meta_data = null,
     ) {
     }
 
     public static function jsonDeSerialize(mixed $data): static
     {
         return new static(
-            $data['id'] ?? 0,
-            $data['code'] ?? '',
-            $data['discount'] ?? '',
-            $data['discount_tax'] ?? '',
-            array_map(
-                static fn (array $item) => OrderMetadata::jsonDeSerialize($item),
-                $data['meta_data'] ?? [],
-            ),
+            int_or_null($data['id'] ?? null),
+            string_or_null($data['code'] ?? null),
+            string_or_null($data['discount'] ?? null),
+            string_or_null($data['discount_tax'] ?? null),
+            isset($data['meta_data']) && is_array($data['meta_data'])
+                ? array_map(static fn (array $item) => OrderMetadata::jsonDeSerialize($item), $data['meta_data'])
+                : null,
         );
     }
 
     public function jsonSerialize(): mixed
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'code' => $this->code,
             'discount' => $this->discount,
             'discount_tax' => $this->discount_tax,
             'meta_data' => $this->meta_data,
-        ];
+        ], static fn (mixed $value) => $value !== null);
     }
 }

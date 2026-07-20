@@ -15,35 +15,38 @@ namespace Woo\Schema;
 use Hyperf\Contract\JsonDeSerializable;
 use JsonSerializable;
 
+use function Woo\int_or_null;
+use function Woo\string_or_null;
+
 class OrderRefund implements JsonSerializable, JsonDeSerializable
 {
     /**
-     * @param int $id Refund ID. READ-ONLY
-     * @param string $reason Refund reason. READ-ONLY
-     * @param string $total Refund total. READ-ONLY
+     * @param null|int $id Refund ID. READ-ONLY
+     * @param null|string $reason Refund reason. READ-ONLY
+     * @param null|string $total Refund total. READ-ONLY
      */
     public function __construct(
-        public int $id = 0,
-        public string $reason = '',
-        public string $total = '',
+        public ?int $id = null,
+        public ?string $reason = null,
+        public ?string $total = null,
     ) {
     }
 
     public static function jsonDeSerialize(mixed $data): static
     {
         return new static(
-            $data['id'] ?? 0,
-            $data['reason'] ?? '',
-            $data['total'] ?? '',
+            int_or_null($data['id'] ?? null),
+            string_or_null($data['reason'] ?? null),
+            string_or_null($data['total'] ?? null),
         );
     }
 
     public function jsonSerialize(): mixed
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'reason' => $this->reason,
             'total' => $this->total,
-        ];
+        ], static fn (mixed $value) => $value !== null);
     }
 }

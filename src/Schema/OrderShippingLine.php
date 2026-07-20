@@ -15,50 +15,51 @@ namespace Woo\Schema;
 use Hyperf\Contract\JsonDeSerializable;
 use JsonSerializable;
 
+use function Woo\int_or_null;
+use function Woo\string_or_null;
+
 class OrderShippingLine implements JsonSerializable, JsonDeSerializable
 {
     /**
-     * @param int $id Item ID. READ-ONLY
-     * @param string $method_title Shipping method name
-     * @param string $method_id Shipping method ID
-     * @param string $total Line total (after discounts)
-     * @param string $total_tax Line total tax (after discounts). READ-ONLY
-     * @param OrderTaxLine[] $taxes Line taxes. READ-ONLY
-     * @param OrderMetadata[] $meta_data Meta data
+     * @param null|int $id Item ID. READ-ONLY
+     * @param null|string $method_title Shipping method name
+     * @param null|string $method_id Shipping method ID
+     * @param null|string $total Line total (after discounts)
+     * @param null|string $total_tax Line total tax (after discounts). READ-ONLY
+     * @param null|OrderTaxLine[] $taxes Line taxes. READ-ONLY
+     * @param null|OrderMetadata[] $meta_data Meta data
      */
     public function __construct(
-        public int $id = 0,
-        public string $method_title = '',
-        public string $method_id = '',
-        public string $total = '',
-        public string $total_tax = '',
-        public array $taxes = [],
-        public array $meta_data = [],
+        public ?int $id = null,
+        public ?string $method_title = null,
+        public ?string $method_id = null,
+        public ?string $total = null,
+        public ?string $total_tax = null,
+        public ?array $taxes = null,
+        public ?array $meta_data = null,
     ) {
     }
 
     public static function jsonDeSerialize(mixed $data): static
     {
         return new static(
-            $data['id'] ?? 0,
-            $data['method_title'] ?? '',
-            $data['method_id'] ?? '',
-            $data['total'] ?? '',
-            $data['total_tax'] ?? '',
-            array_map(
-                static fn (array $item) => OrderTaxLine::jsonDeSerialize($item),
-                $data['taxes'] ?? [],
-            ),
-            array_map(
-                static fn (array $item) => OrderMetadata::jsonDeSerialize($item),
-                $data['meta_data'] ?? [],
-            ),
+            int_or_null($data['id'] ?? null),
+            string_or_null($data['method_title'] ?? null),
+            string_or_null($data['method_id'] ?? null),
+            string_or_null($data['total'] ?? null),
+            string_or_null($data['total_tax'] ?? null),
+            isset($data['taxes']) && is_array($data['taxes'])
+                ? array_map(static fn (array $item) => OrderTaxLine::jsonDeSerialize($item), $data['taxes'])
+                : null,
+            isset($data['meta_data']) && is_array($data['meta_data'])
+                ? array_map(static fn (array $item) => OrderMetadata::jsonDeSerialize($item), $data['meta_data'])
+                : null,
         );
     }
 
     public function jsonSerialize(): mixed
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'method_title' => $this->method_title,
             'method_id' => $this->method_id,
@@ -66,6 +67,6 @@ class OrderShippingLine implements JsonSerializable, JsonDeSerializable
             'total_tax' => $this->total_tax,
             'taxes' => $this->taxes,
             'meta_data' => $this->meta_data,
-        ];
+        ], static fn (mixed $value) => $value !== null);
     }
 }

@@ -15,6 +15,10 @@ namespace Woo\Schema;
 use Hyperf\Contract\JsonDeSerializable;
 use JsonSerializable;
 
+use function Woo\bool_or_null;
+use function Woo\int_or_null;
+use function Woo\string_or_null;
+
 /**
  * WooCommerce Order 数据模型.
  *
@@ -23,167 +27,160 @@ use JsonSerializable;
 class Order implements JsonSerializable, JsonDeSerializable
 {
     /**
-     * @param int $id Unique identifier for the resource. READ-ONLY
-     * @param int $parent_id Parent order ID
-     * @param string $number Order number. READ-ONLY
-     * @param string $order_key Order key. READ-ONLY
-     * @param string $created_via Shows where the order was created
-     * @param string $version Version of WooCommerce which last updated the order. READ-ONLY
-     * @param string $status Order status: pending, processing, on-hold, completed, cancelled, refunded, failed, trash
-     * @param string $currency Currency the order was created with, in ISO format
-     * @param string $date_created The date the order was created, in the site's timezone. READ-ONLY
-     * @param string $date_created_gmt The date the order was created, as GMT. READ-ONLY
-     * @param string $date_modified The date the order was last modified, in the site's timezone. READ-ONLY
-     * @param string $date_modified_gmt The date the order was last modified, as GMT. READ-ONLY
-     * @param string $discount_total Total discount amount for the order. READ-ONLY
-     * @param string $discount_tax Total discount tax amount for the order. READ-ONLY
-     * @param string $shipping_total Total shipping amount for the order. READ-ONLY
-     * @param string $shipping_tax Total shipping tax amount for the order. READ-ONLY
-     * @param string $cart_tax Sum of line item taxes only. READ-ONLY
-     * @param string $total Grand total. READ-ONLY
-     * @param string $total_tax Sum of all taxes. READ-ONLY
-     * @param bool $prices_include_tax True if prices included tax during checkout. READ-ONLY
-     * @param int $customer_id User ID who owns the order. 0 for guests
-     * @param string $customer_ip_address Customer's IP address. READ-ONLY
-     * @param string $customer_user_agent User agent of the customer. READ-ONLY
-     * @param string $customer_note Note left by customer during checkout
+     * @param null|int $id Unique identifier for the resource. READ-ONLY
+     * @param null|int $parent_id Parent order ID
+     * @param null|string $number Order number. READ-ONLY
+     * @param null|string $order_key Order key. READ-ONLY
+     * @param null|string $created_via Shows where the order was created. It can only be set during order creation and cannot be modified afterward
+     * @param null|string $version Version of WooCommerce which last updated the order. READ-ONLY
+     * @param null|string $status Order status. Options: pending, processing, on-hold, completed, cancelled, refunded, failed and trash. Default is pending
+     * @param null|string $currency Currency the order was created with, in ISO format. Default is USD
+     * @param null|string $date_created The date the order was created, in the site's timezone. READ-ONLY
+     * @param null|string $date_created_gmt The date the order was created, as GMT. READ-ONLY
+     * @param null|string $date_modified The date the order was last modified, in the site's timezone. READ-ONLY
+     * @param null|string $date_modified_gmt The date the order was last modified, as GMT. READ-ONLY
+     * @param null|string $discount_total Total discount amount for the order. READ-ONLY
+     * @param null|string $discount_tax Total discount tax amount for the order. READ-ONLY
+     * @param null|string $shipping_total Total shipping amount for the order. READ-ONLY
+     * @param null|string $shipping_tax Total shipping tax amount for the order. READ-ONLY
+     * @param null|string $cart_tax Sum of line item taxes only. READ-ONLY
+     * @param null|string $total Grand total. READ-ONLY
+     * @param null|string $total_tax Sum of all taxes. READ-ONLY
+     * @param null|bool $prices_include_tax True the prices included tax during checkout. READ-ONLY
+     * @param null|int $customer_id User ID who owns the order. 0 for guests. Default is 0
+     * @param null|string $customer_ip_address Customer's IP address. READ-ONLY
+     * @param null|string $customer_user_agent User agent of the customer. READ-ONLY
+     * @param null|string $customer_note Note left by customer during checkout
      * @param null|OrderBilling $billing Billing address
      * @param null|OrderShipping $shipping Shipping address
-     * @param string $payment_method Payment method ID
-     * @param string $payment_method_title Payment method title
-     * @param string $transaction_id Unique transaction ID
-     * @param string $date_paid The date the order was paid, in the site's timezone. READ-ONLY
-     * @param string $date_paid_gmt The date the order was paid, as GMT. READ-ONLY
-     * @param string $date_completed The date the order was completed, in the site's timezone. READ-ONLY
-     * @param string $date_completed_gmt The date the order was completed, as GMT. READ-ONLY
-     * @param string $cart_hash MD5 hash of cart items. READ-ONLY
-     * @param OrderMetadata[] $meta_data Meta data
-     * @param OrderLineItem[] $line_items Line items data
-     * @param OrderTaxLine[] $tax_lines Tax lines data. READ-ONLY
-     * @param OrderShippingLine[] $shipping_lines Shipping lines data
-     * @param OrderFeeLine[] $fee_lines Fee lines data
-     * @param OrderCouponLine[] $coupon_lines Coupons line data
-     * @param OrderRefund[] $refunds List of refunds. READ-ONLY
-     * @param bool $set_paid Define if the order is paid. WRITE-ONLY
+     * @param null|string $payment_method Payment method ID
+     * @param null|string $payment_method_title Payment method title
+     * @param null|string $transaction_id Unique transaction ID
+     * @param null|string $date_paid The date the order was paid, in the site's timezone. READ-ONLY
+     * @param null|string $date_paid_gmt The date the order was paid, as GMT. READ-ONLY
+     * @param null|string $date_completed The date the order was completed, in the site's timezone. READ-ONLY
+     * @param null|string $date_completed_gmt The date the order was completed, as GMT. READ-ONLY
+     * @param null|string $cart_hash MD5 hash of cart items to ensure orders are not modified. READ-ONLY
+     * @param null|OrderMetadata[] $meta_data Meta data
+     * @param null|OrderLineItem[] $line_items Line items data
+     * @param null|OrderTaxLine[] $tax_lines Tax lines data. READ-ONLY
+     * @param null|OrderShippingLine[] $shipping_lines Shipping lines data
+     * @param null|OrderFeeLine[] $fee_lines Fee lines data
+     * @param null|OrderCouponLine[] $coupon_lines Coupons line data
+     * @param null|OrderRefund[] $refunds List of refunds. READ-ONLY
+     * @param null|bool $set_paid Define if the order is paid. It will set the status to processing and reduce stock items. Default is false. WRITE-ONLY
      */
     public function __construct(
-        public int $id = 0,
-        public int $parent_id = 0,
-        public string $number = '',
-        public string $order_key = '',
-        public string $created_via = '',
-        public string $version = '',
-        public string $status = '',
-        public string $currency = '',
-        public string $date_created = '',
-        public string $date_created_gmt = '',
-        public string $date_modified = '',
-        public string $date_modified_gmt = '',
-        public string $discount_total = '',
-        public string $discount_tax = '',
-        public string $shipping_total = '',
-        public string $shipping_tax = '',
-        public string $cart_tax = '',
-        public string $total = '',
-        public string $total_tax = '',
-        public bool $prices_include_tax = false,
-        public int $customer_id = 0,
-        public string $customer_ip_address = '',
-        public string $customer_user_agent = '',
-        public string $customer_note = '',
+        public ?int $id = null,
+        public ?int $parent_id = null,
+        public ?string $number = null,
+        public ?string $order_key = null,
+        public ?string $created_via = null,
+        public ?string $version = null,
+        public ?string $status = null,
+        public ?string $currency = null,
+        public ?string $date_created = null,
+        public ?string $date_created_gmt = null,
+        public ?string $date_modified = null,
+        public ?string $date_modified_gmt = null,
+        public ?string $discount_total = null,
+        public ?string $discount_tax = null,
+        public ?string $shipping_total = null,
+        public ?string $shipping_tax = null,
+        public ?string $cart_tax = null,
+        public ?string $total = null,
+        public ?string $total_tax = null,
+        public ?bool $prices_include_tax = null,
+        public ?int $customer_id = null,
+        public ?string $customer_ip_address = null,
+        public ?string $customer_user_agent = null,
+        public ?string $customer_note = null,
         public ?OrderBilling $billing = null,
         public ?OrderShipping $shipping = null,
-        public string $payment_method = '',
-        public string $payment_method_title = '',
-        public string $transaction_id = '',
-        public string $date_paid = '',
-        public string $date_paid_gmt = '',
-        public string $date_completed = '',
-        public string $date_completed_gmt = '',
-        public string $cart_hash = '',
-        public array $meta_data = [],
-        public array $line_items = [],
-        public array $tax_lines = [],
-        public array $shipping_lines = [],
-        public array $fee_lines = [],
-        public array $coupon_lines = [],
-        public array $refunds = [],
-        public bool $set_paid = false,
+        public ?string $payment_method = null,
+        public ?string $payment_method_title = null,
+        public ?string $transaction_id = null,
+        public ?string $date_paid = null,
+        public ?string $date_paid_gmt = null,
+        public ?string $date_completed = null,
+        public ?string $date_completed_gmt = null,
+        public ?string $cart_hash = null,
+        public ?array $meta_data = null,
+        public ?array $line_items = null,
+        public ?array $tax_lines = null,
+        public ?array $shipping_lines = null,
+        public ?array $fee_lines = null,
+        public ?array $coupon_lines = null,
+        public ?array $refunds = null,
+        public ?bool $set_paid = null,
     ) {
     }
 
     public static function jsonDeSerialize(mixed $data): static
     {
         return new static(
-            $data['id'] ?? 0,
-            $data['parent_id'] ?? 0,
-            $data['number'] ?? '',
-            $data['order_key'] ?? '',
-            $data['created_via'] ?? '',
-            $data['version'] ?? '',
-            $data['status'] ?? '',
-            $data['currency'] ?? '',
-            $data['date_created'] ?? '',
-            $data['date_created_gmt'] ?? '',
-            $data['date_modified'] ?? '',
-            $data['date_modified_gmt'] ?? '',
-            $data['discount_total'] ?? '',
-            $data['discount_tax'] ?? '',
-            $data['shipping_total'] ?? '',
-            $data['shipping_tax'] ?? '',
-            $data['cart_tax'] ?? '',
-            $data['total'] ?? '',
-            $data['total_tax'] ?? '',
-            $data['prices_include_tax'] ?? false,
-            $data['customer_id'] ?? 0,
-            $data['customer_ip_address'] ?? '',
-            $data['customer_user_agent'] ?? '',
-            $data['customer_note'] ?? '',
+            int_or_null($data['id'] ?? null),
+            int_or_null($data['parent_id'] ?? null),
+            string_or_null($data['number'] ?? null),
+            string_or_null($data['order_key'] ?? null),
+            string_or_null($data['created_via'] ?? null),
+            string_or_null($data['version'] ?? null),
+            string_or_null($data['status'] ?? null),
+            string_or_null($data['currency'] ?? null),
+            string_or_null($data['date_created'] ?? null),
+            string_or_null($data['date_created_gmt'] ?? null),
+            string_or_null($data['date_modified'] ?? null),
+            string_or_null($data['date_modified_gmt'] ?? null),
+            string_or_null($data['discount_total'] ?? null),
+            string_or_null($data['discount_tax'] ?? null),
+            string_or_null($data['shipping_total'] ?? null),
+            string_or_null($data['shipping_tax'] ?? null),
+            string_or_null($data['cart_tax'] ?? null),
+            string_or_null($data['total'] ?? null),
+            string_or_null($data['total_tax'] ?? null),
+            bool_or_null($data['prices_include_tax'] ?? null),
+            int_or_null($data['customer_id'] ?? null),
+            string_or_null($data['customer_ip_address'] ?? null),
+            string_or_null($data['customer_user_agent'] ?? null),
+            string_or_null($data['customer_note'] ?? null),
             isset($data['billing']) && is_array($data['billing']) ? OrderBilling::jsonDeSerialize($data['billing']) : null,
             isset($data['shipping']) && is_array($data['shipping']) ? OrderShipping::jsonDeSerialize($data['shipping']) : null,
-            $data['payment_method'] ?? '',
-            $data['payment_method_title'] ?? '',
-            $data['transaction_id'] ?? '',
-            $data['date_paid'] ?? '',
-            $data['date_paid_gmt'] ?? '',
-            $data['date_completed'] ?? '',
-            $data['date_completed_gmt'] ?? '',
-            $data['cart_hash'] ?? '',
-            array_map(
-                static fn (array $item) => OrderMetadata::jsonDeSerialize($item),
-                $data['meta_data'] ?? [],
-            ),
-            array_map(
-                static fn (array $item) => OrderLineItem::jsonDeSerialize($item),
-                $data['line_items'] ?? [],
-            ),
-            array_map(
-                static fn (array $item) => OrderTaxLine::jsonDeSerialize($item),
-                $data['tax_lines'] ?? [],
-            ),
-            array_map(
-                static fn (array $item) => OrderShippingLine::jsonDeSerialize($item),
-                $data['shipping_lines'] ?? [],
-            ),
-            array_map(
-                static fn (array $item) => OrderFeeLine::jsonDeSerialize($item),
-                $data['fee_lines'] ?? [],
-            ),
-            array_map(
-                static fn (array $item) => OrderCouponLine::jsonDeSerialize($item),
-                $data['coupon_lines'] ?? [],
-            ),
-            array_map(
-                static fn (array $item) => OrderRefund::jsonDeSerialize($item),
-                $data['refunds'] ?? [],
-            ),
-            $data['set_paid'] ?? false,
+            string_or_null($data['payment_method'] ?? null),
+            string_or_null($data['payment_method_title'] ?? null),
+            string_or_null($data['transaction_id'] ?? null),
+            string_or_null($data['date_paid'] ?? null),
+            string_or_null($data['date_paid_gmt'] ?? null),
+            string_or_null($data['date_completed'] ?? null),
+            string_or_null($data['date_completed_gmt'] ?? null),
+            string_or_null($data['cart_hash'] ?? null),
+            isset($data['meta_data']) && is_array($data['meta_data'])
+                ? array_map(static fn (array $item) => OrderMetadata::jsonDeSerialize($item), $data['meta_data'])
+                : null,
+            isset($data['line_items']) && is_array($data['line_items'])
+                ? array_map(static fn (array $item) => OrderLineItem::jsonDeSerialize($item), $data['line_items'])
+                : null,
+            isset($data['tax_lines']) && is_array($data['tax_lines'])
+                ? array_map(static fn (array $item) => OrderTaxLine::jsonDeSerialize($item), $data['tax_lines'])
+                : null,
+            isset($data['shipping_lines']) && is_array($data['shipping_lines'])
+                ? array_map(static fn (array $item) => OrderShippingLine::jsonDeSerialize($item), $data['shipping_lines'])
+                : null,
+            isset($data['fee_lines']) && is_array($data['fee_lines'])
+                ? array_map(static fn (array $item) => OrderFeeLine::jsonDeSerialize($item), $data['fee_lines'])
+                : null,
+            isset($data['coupon_lines']) && is_array($data['coupon_lines'])
+                ? array_map(static fn (array $item) => OrderCouponLine::jsonDeSerialize($item), $data['coupon_lines'])
+                : null,
+            isset($data['refunds']) && is_array($data['refunds'])
+                ? array_map(static fn (array $item) => OrderRefund::jsonDeSerialize($item), $data['refunds'])
+                : null,
+            bool_or_null($data['set_paid'] ?? null),
         );
     }
 
     public function jsonSerialize(): mixed
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'parent_id' => $this->parent_id,
             'number' => $this->number,
@@ -226,6 +223,6 @@ class Order implements JsonSerializable, JsonDeSerializable
             'coupon_lines' => $this->coupon_lines,
             'refunds' => $this->refunds,
             'set_paid' => $this->set_paid,
-        ];
+        ], static fn (mixed $value) => $value !== null);
     }
 }

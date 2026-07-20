@@ -15,50 +15,52 @@ namespace Woo\Schema;
 use Hyperf\Contract\JsonDeSerializable;
 use JsonSerializable;
 
+use function Woo\string_or_null;
+
 class OrderShipping implements JsonSerializable, JsonDeSerializable
 {
     /**
-     * @param string $first_name First name
-     * @param string $last_name Last name
-     * @param string $company Company name
-     * @param string $address_1 Address line 1
-     * @param string $address_2 Address line 2
-     * @param string $city City
-     * @param string $state State or county
-     * @param string $postcode Postcode or ZIP
-     * @param string $country Country ISO 3166-1 alpha-2 code
+     * @param null|string $first_name First name
+     * @param null|string $last_name Last name
+     * @param null|string $company Company name
+     * @param null|string $address_1 Address line 1
+     * @param null|string $address_2 Address line 2
+     * @param null|string $city City name
+     * @param null|string $state ISO code or name of the state, province or district
+     * @param null|string $postcode Postal code
+     * @param null|string $country Country code in ISO 3166-1 alpha-2 format
      */
     public function __construct(
-        public string $first_name = '',
-        public string $last_name = '',
-        public string $company = '',
-        public string $address_1 = '',
-        public string $address_2 = '',
-        public string $city = '',
-        public string $state = '',
-        public string $postcode = '',
-        public string $country = '',
+        public ?string $first_name = null,
+        public ?string $last_name = null,
+        public ?string $company = null,
+        public ?string $address_1 = null,
+        public ?string $address_2 = null,
+        public ?string $city = null,
+        public ?string $state = null,
+        public ?string $postcode = null,
+        public ?string $country = null,
     ) {
     }
 
     public static function jsonDeSerialize(mixed $data): static
     {
         return new static(
-            $data['first_name'] ?? '',
-            $data['last_name'] ?? '',
-            $data['company'] ?? '',
-            $data['address_1'] ?? '',
-            $data['address_2'] ?? '',
-            $data['city'] ?? '',
-            $data['state'] ?? '',
-            $data['postcode'] ?? '',
-            $data['country'] ?? '',
+            string_or_null($data['first_name'] ?? null),
+            string_or_null($data['last_name'] ?? null),
+            string_or_null($data['company'] ?? null),
+            string_or_null($data['address_1'] ?? null),
+            string_or_null($data['address_2'] ?? null),
+            string_or_null($data['city'] ?? null),
+            string_or_null($data['state'] ?? null),
+            string_or_null($data['postcode'] ?? null),
+            string_or_null($data['country'] ?? null),
         );
     }
 
     public function jsonSerialize(): mixed
     {
-        return [
+        return array_filter([
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'company' => $this->company,
@@ -68,6 +70,6 @@ class OrderShipping implements JsonSerializable, JsonDeSerializable
             'state' => $this->state,
             'postcode' => $this->postcode,
             'country' => $this->country,
-        ];
+        ], static fn (mixed $value) => $value !== null);
     }
 }

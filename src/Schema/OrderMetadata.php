@@ -15,35 +15,38 @@ namespace Woo\Schema;
 use Hyperf\Contract\JsonDeSerializable;
 use JsonSerializable;
 
+use function Woo\int_or_null;
+use function Woo\string_or_null;
+
 class OrderMetadata implements JsonSerializable, JsonDeSerializable
 {
     /**
-     * @param int $id Meta ID. READ-ONLY
-     * @param string $key Meta key
-     * @param string $value Meta value
+     * @param null|int $id Meta ID. READ-ONLY
+     * @param null|string $key Meta key
+     * @param null|string $value Meta value
      */
     public function __construct(
-        public int $id = 0,
-        public string $key = '',
-        public string $value = '',
+        public ?int $id = null,
+        public ?string $key = null,
+        public ?string $value = null,
     ) {
     }
 
     public static function jsonDeSerialize(mixed $data): static
     {
         return new static(
-            $data['id'] ?? 0,
-            $data['key'] ?? '',
-            $data['value'] ?? '',
+            int_or_null($data['id'] ?? null),
+            string_or_null($data['key'] ?? null),
+            string_or_null($data['value'] ?? null),
         );
     }
 
     public function jsonSerialize(): mixed
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'key' => $this->key,
             'value' => $this->value,
-        ];
+        ], static fn (mixed $value) => $value !== null);
     }
 }
