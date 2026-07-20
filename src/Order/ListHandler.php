@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Woo\Order;
 
+use Hyperf\Codec\Json;
+use Hyperf\HttpMessage\Stream\SwooleStream;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Woo\Order\Request\ListRequest;
@@ -27,7 +29,14 @@ abstract class ListHandler implements ServerHandlerInterface
 
     public function handle(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        return $response;
+        $query = [];
+        parse_str($request->getUri()->getQuery(), $query);
+
+        $request = ListRequest::jsonDeSerialize($query);
+
+        $result = $this->run($request);
+
+        return $response->withBody(new SwooleStream(Json::encode($result)));
     }
 
     /**
